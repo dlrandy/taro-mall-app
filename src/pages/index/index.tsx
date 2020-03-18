@@ -5,16 +5,16 @@ import {
   Swiper,
   SwiperItem,
   Text,
+  Input,
   Navigator,
   Image
 } from '@tarojs/components'
 import {observer, inject} from '@tarojs/mobx'
 import WXAPI from 'apifm-wxapi'
-import app_config from '../../config/app-config'
 import './index.scss'
 import shopInfo_l_image from '../../images/order-details/icon-address.png';
 import shopInfo_r_image from '../../images/icon/next.png';
-
+import search_image from '../../images/icon/search.svg'
 type PageStateProps = {
   shopInfoStore: {
     shopInfo: {
@@ -34,10 +34,14 @@ interface Index {
 @observer
 class Index extends Component {
 
-  constructor(...props) {
+  constructor(...props: any) {
     super(...props)
     this.state = {
-      banner_data: null
+      banner_data: {
+        banners: [],
+        adInfo:{}
+      },
+      inputVal: '',
     }
   }
 
@@ -48,7 +52,7 @@ class Index extends Component {
    * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
-  config : Config = app_config;
+  config : Config = {}
 
   componentWillMount() {}
 
@@ -56,7 +60,9 @@ class Index extends Component {
     console.log('componentWillReact')
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.initBanners()
+  }
 
   componentWillUnmount() {}
 
@@ -83,6 +89,21 @@ class Index extends Component {
       return {banner_data: _data};
     })
   }
+
+  bindInput(e: { detail: { value: any } }) {
+    this.setState({
+      inputVal: e.detail.value
+    })
+  }
+
+  bindConfirm(e: { detail: { value: any } }) {
+    this.setState({
+      inputVal: e.detail.value
+    })
+    Taro.navigateTo({
+      url: '/pages/goods/list?name=' + this.state.inputVal,
+    })
+  },
   // increment = () => {   const { counterStore } = this.props
   // counterStore.increment() } decrement = () => {   const { counterStore } =
   // this.props   counterStore.decrement() } incrementAsync = () => {   const {
@@ -109,25 +130,27 @@ class Index extends Component {
 }
         </Navigator>
         <View className="swiper-container">
+        <View className="search">
+        <Input type="text" placeholder="输入搜索关键词" value={this.state.inputVal} onInput={this.bindInput} onConfirm={this.bindConfirm}></Input>
+        <Image src={search_image}></Image>
+      </View>
           <Swiper
-            className='test-h'
             indicatorColor='#999'
             indicatorActiveColor='#333'
-            vertical
             circular
             indicatorDots
             autoplay>
-            <SwiperItem>
-              <View className='demo-text-1'>1</View>
+          {
+            banner_data.banners.map((item: { id: string | number | undefined; linkUrl: any; picUrl: string })=>(
+              <SwiperItem key={item.id}>
+              <Image  mode="aspectFill"   data-url={item.linkUrl} src={item.picUrl} />
             </SwiperItem>
-            <SwiperItem>
-              <View className='demo-text-2'>2</View>
-            </SwiperItem>
-            <SwiperItem>
-              <View className='demo-text-3'>3</View>
-            </SwiperItem>
+            ))
+          }
+
           </Swiper>
         </View>
+        
       </View>
     )
   }

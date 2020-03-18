@@ -6,7 +6,6 @@ import {get as getGlobalData} from '../../utils/global_data'
 import {View, Swiper, SwiperItem, Image, Button} from '@tarojs/components'
 import { ITouchEvent } from '@tarojs/components/types/common'
 
-import './start.scss'
 
 function jumpToPage () {
   if (WX_API_CONFIG.shopMod) {
